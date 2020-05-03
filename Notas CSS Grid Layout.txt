@@ -1,0 +1,295 @@
+Flex estaba mas pensado para lineas. No es tan facil mover elementos en cualquier direccion
+
+Con emmet:
+
+	Si escribis section.container te crea
+
+		<section class="container">
+		
+		</section>
+		
+	Si escribis .item{contenido #$}*12
+
+		Te crea 12 divs de class item con contenido "contenido #1"
+													"contenido #2"
+													...
+
+El borde marca visualmente la grilla.
+
+display: grid
+
+sin nada mas te pone filas asi:
+
+div1
+div2
+div3
+...
+
+grid-template-columns: 100px 100px 100px Aca podes mezclar medidas: porcentajes etc.
+
+div1     div2      div3
+div4	 div5      div6
+...
+
+Hay grilla implicita y explicita
+
+La explicita es la que definis en el css
+
+grid-template-columns: 25% 200px 25;
+grid-template-rows: 300px 150px;
+grid-template: filas / columnas;
+
+grid-template: 300px 100px 100px / 50% 200px 100px
+
+Si especificas menos que las que hay de divs, se acomodan con tamaños default.
+
+.item:nth-of-type(4){
+	background: blue;
+}
+
+te pinta de azul el fondo del 4to item.
+
+Para crear item con subitems adentro:
+
+	.item{subitem #$}*5
+	
+	A los subitems quizas no les alcanza el alto del item mayor entonces: overflow:auto te crea la barrita
+	
+display: subgrid hereda toda la config del grid padre.
+
+Nos ahorramos tener que volver a copiarle al hijo: grid-template: 300px 100px 100px / 50% 200px 100px si es que queremos misma config
+
+Al agregar margin a los items te achica los elementos un poco acorde a lo que dice la grilla que ocupa cada item.
+
+grid-gap hace que no se te achiquen los tamaños de grilla que especificaste. Vas a ver hueco entre filas y columnas.
+
+grid-column-gap: 30px;
+grid-row-gap: 50px;
+grid-gap: filas columnas;
+
+grid-gap: 10px 100px;
+
+Existe otra unidad de medida para dividir en porciones la pantalla: fr
+
+fr vs auto. auto te agranda el tamaño si es que alguna subgrilla se quedó corta y requirio overflow.
+
+Hay funciones css para evitar repetir valores css:
+
+	en vez de:
+
+	grid-template: 300px 100px 100px / 1fr 1fr 1fr 1fr;
+
+	ponemos
+
+	grid-template: 300px 100px 100px / repeat(4, 1fr);
+
+	Si pones tamaño: minmax(200px, 1fr);
+	
+		va a tener 200px minimo y maximo 1fr. Es decir que cuando achicas la pantalla, MINIMAMENTE van a tener ese ancho de 200px y vas a tener que 
+		scrollear la pantalla al costado para poder ver.
+		
+	Para que las fracciones sean claaras y la grilla te cubra toda la pantalla tenes que ponerle al container un alto especifico. Podría ser 100vh.
+	
+	
+	The viewport is the user's visible area of a web page. The viewport varies with the device, and will be smaller on a mobile phone than on 
+	a computer screen.
+	
+	1vh = 1% de la altura del viewport
+
+	100vh = altura del viewport
+
+	1vw = 1% del ancho del viewport
+
+	100vw = ancho del viewport
+	
+	Ejemplo inicial
+	
+		-------------------------------------------
+	   |			HEADER						   |
+		-------------------------------------------
+	   |        |                                  |
+	   | LEFT   |          CONTENIDO               |
+	   |        |                                  |
+	   |		|								   |
+	    -------------------------------------------
+	   |              FOOTER                       |
+		-------------------------------------------
+		
+	.grid{
+			
+		grid-template: 100px 1fr 150px / 200px 1fr;
+		
+		Los fr siempre toman el espacio restante.
+		
+		grid-template-areas: "header header"
+							 "left contenido"
+							 "footer footer"
+	}
+
+	.header{
+		grid-area: header;
+	}
+	.left{
+		grid-area: left;
+	}
+	.contenido{
+		grid-area: contenido;
+	}
+	.footer{
+		grid-area: footer;
+	}
+	
+	Entonces a cada elemento ademas de la clase item le pones una de esas clases.
+	
+	La cantidad de columnas la calculas en base a la columna mas chica que haya.
+		
+	Para ponerle estilos a un item especifico (en este caso el primero):
+	
+		.item:nth-of-type(1){
+			grid-column-start: 1;
+			grid-column-end: 3;
+			// Con esto le dijimos que ocupe dos columnas, abarcando desde la LINEA de la grilla 1 hasta la 3 (donde comienza la tercera columna)
+		}
+		
+		o grid-column: 1 / 3
+		
+	Podes especificar donde empieza el item y cuanto mide:
+	
+		grid-column: 1 / span 2    asi empieza en la proxima linea que sea primera de fila y ocupa dos items.
+		
+	Para que ocupe todo el ancho:
+	
+		grid-column : 1 / -1
+		
+	Para que un elemento ocupe dos filas desde el comienzo:
+	
+		grid-row: 1 / span 2
+		
+	
+	
+	Podes ponerle alias a las lineas separadoras para que sea mas facil especificar desde donde hasta donde va cada item:
+	
+		grid-template-columns: [inicio] 1fr [linea2] 1fr [linea3] 1fr [destacado-end] .... 1fr [final]
+		grid-template-row: [inicio] 1fr [linea2] 1fr [final]
+		
+	luego en los items les aclaras:
+	
+		.item:nth-of-type(1){
+			grid-column: inicio / destacado-end;
+			grid-row: inicio / final;
+		}
+		
+	grid-implicito: items sobrantes al template.
+	
+	El default es grid-auto-flow: row; que hace que todo item sobrante al template se vaya acomodando hacia las filas de abajo.
+	
+	grid-auto-flow: column hace que se te vayan a la derecha como columnas nuevas (en el ejemplo vemos 4 cuadrados porque son dos filas). Te los va 
+	acomodando en vertical hacia la derecha y abajo si hay fila.
+	
+	Si no pones grid-template-rows: todas las filas son implicitas de alto.
+	
+	grid-auto-columns: 50px 100px; da patron de ancho de cada columna nueva implicita a la derecha.
+	
+	grid-auto-columns: 50px 100px; da patron de alto de cada fila nueva con items implicitos.
+	
+	
+	Al darle tamaño de fr: el default es align y justify stretch, osea que el item ocupe todo el espacio asignado en alto y ancho.
+	
+	Si pones:
+	
+		justify-items: center;      Horizontal
+		align-items: center;		  Vertical
+	
+		estos te dicen cómo se acomoda y ajusta cada itema dentro de su espacio asignado en el template.
+	
+		rompe el stretch y hace que el item se achique hasta ocupar lo suficiente para que se vea su contenido y ya.
+		
+		tambien aceptan start, end, stretch (default)
+		
+	justify-content mueve todas las columnas al start, end, center, space-around (agrega espacio a izquierda y derecha de cada columna)
+	space-evenly pone el mismo espacio en todos los lugares libres.
+	space-between pone columan en inicio, algunas en el medio y otra en final.
+	
+	align-content: similar pero con filas. start, end, space-around, space-between, space-evenly
+	
+	gap es diferente, es espaciado, estos de arriba son alineaciones.
+	
+	rgba te da transparencia, ejemplo: rgba(0,0,0, .4) te da 40% de transparencia
+	
+	position absolute hace que tu elemento arranque desde el comiezno de la posicion del padre inmediato. Toma posicion del elemento mas cercarno padre
+	con posicion relativa.
+	
+	position relative te acomoda el elemento tipo block.
+	
+	Para encimar elementos encima de otro tenes que usar absolute.
+	
+	Una vez absolute, para que ocupe todo el contenedor padre: top, bottom, right, left en 0
+	
+	A cada post de instagram que es un item de grilla, le ponemos position relative asi cada elemento interior, en este caso el overlay, puede tomar
+	position absolute en base al relative de ese padre.
+	
+	Figure tiene margenes molestos por default.
+	
+	span: contenendor de texto
+	figure: contenedor de imagen.
+	
+	width: 100% tiene en cuenta el tamaño entero del objeto padre, es decir, incluyendo, padding, margin etc, lo que puede hacer que se te sobresalga
+	del contenido en si
+	
+	width auto deja al browser que acomode elementos con margen etc para que quede centrado pero creo que es en el total de la pantalla.
+	
+	inline; /* the default for span */
+	
+	Compared to display: inline, the major difference is that display: inline-block allows to set a width and height on the element.
+	
+	Also, with display: inline-block, the top and bottom margins/paddings are respected, but with display: inline they are not.
+
+	Compared to display: block, the major difference is that display: inline-block does not add a line-break after the element, so the element can sit next to other elements.
+	
+	Para el responsive usamos media queries
+	
+		@media screen and (max-width: 768px){
+			.post-list{
+				grid-gap: 3px;
+			}
+		}
+	asi no quedan tan separados. Tener en cuenta que el ancho y alto está controlado por el minmax del template.
+	
+	Para hacer que te ocupe todas las columnas posibles para pinterest:
+	
+		grid-template-columns: repeat(auto-fill, 250px);     ese auto-fill ubica columnas al costado si es posible y ya lo hace responsive para cuando
+		el ancho sea menor en pantallas chicas.
+		
+	Para que cada item se acomode en alto segun cantidad de unidades que le digamos:
+	
+		grid-row-end: span 3;
+		
+		así sin especificar donde comienza le decimos que de alto va a ocupar 3 unidades, entonces se va aacomodando donde tenga lugar.
+		
+	A cada item le pones clase segun su tamaño:
+	
+		.level-1 {
+		  grid-row-end: span 3;
+		}
+
+		.level-2 {
+		  grid-row-end: span 2;
+		}
+		.level-3 {
+		  grid-row-end: span 1;
+		}
+		
+	Cada item esta limitado por el tamaño de columna definido en el template.
+
+	Su alto se autoajusta segun su aspect ratio.
+	
+	
+	El tamaño de los span no es igual. Primero te calcula el temañao de span minimo para que entre un objeto. Luego el sobrante, lo divide en partes
+	iguales.
+	Al item intermedio lo alarga completandolo con tantas partes iguales de esas sobrantes como pueda.
+	
+	Para saltear bloque de texto <p>
+	
+	<span> <span> <span>  se ponen en una misma linea
+	
+	
