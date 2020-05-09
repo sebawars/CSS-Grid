@@ -293,3 +293,8 @@ Hay funciones css para evitar repetir valores css:
 	<span> <span> <span>  se ponen en una misma linea
 	
 	
+	
+Haciendo pruebas con el de perritos, inline-block te pone al costado las cosas si es que entran.
+En este caso tenemos un grid al costado que va a querer crecer todo lo que pueda.
+Flex te lo ajusta al ancho maximo.
+
